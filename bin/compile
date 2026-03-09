@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+GRAFANA_VERSION=`echo ${GRAFANA_DOWNLOAD_URL} | cut -d "_" -f2`
+
+echo "-----> Installing Grafana ${GRAFANA_VERSION}"
+
+BUILD_DIR=${1:-}  # The location of the future app
+CACHE_DIR=${2:-}  # The contents of CACHE_DIR will be persisted between builds.
+
+if [ -d "$CACHE_DIR/grafana-${GRAFANA_VERSION}-linux-amd64" ]; then
+    echo "       Using Grafana ${GRAFANA_VERSION} from cache"
+else
+    echo "       Downloading Grafana ${GRAFANA_VERSION}"
+    curl -s -L $GRAFANA_DOWNLOAD_URL --output /tmp/grafana-${GRAFANA_VERSION}-linux-amd64.tar.gz
+    mkdir -p $CACHE_DIR/grafana-${GRAFANA_VERSION}-linux-amd64
+    tar -xf /tmp/grafana-${GRAFANA_VERSION}-linux-amd64.tar.gz -C $CACHE_DIR/grafana-${GRAFANA_VERSION}-linux-amd64
+fi
+
+echo "       Installing Grafana ${GRAFANA_VERSION}"
+cp -r "$CACHE_DIR/grafana-${GRAFANA_VERSION}-linux-amd64/grafana-${GRAFANA_VERSION}" "$BUILD_DIR/grafana"
+
+echo "       Done"
+exit 0
